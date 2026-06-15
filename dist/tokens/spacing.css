@@ -1,0 +1,34 @@
+/* ============================================================
+   SPACING, LAYOUT & RADII — Tufan Sezer
+   The site is built on a single centered column with generous
+   vertical rhythm and square corners (radius is near-zero — this
+   is a deliberate, architectural, "film equipment" feel).
+   ============================================================ */
+:root {
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-9:  36px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-18: 72px;   /* play-ring scale */
+  --space-section: 110px;  /* vertical padding between sections */
+
+  /* ---- Layout ---- */
+  --layout-max:    1320px;  /* centered content column */
+  --layout-gutter: 24px;    /* page side padding */
+  --grid-gap:      20px;    /* card grid gap */
+
+  /* ---- Radii — square by design ---- */
+  --radius-none:  0;        /* default for cards, buttons, inputs */
+  --radius-pill:  999px;    /* play ring & circular elements only */
+
+  /* ---- Border widths ---- */
+  --border-hair: 1px;       /* all borders are hairline */
+  --letterbox:   10px;      /* cinematic black bands top/bottom of hero */
+}

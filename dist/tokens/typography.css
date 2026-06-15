@@ -1,0 +1,58 @@
+/* ============================================================
+   TYPOGRAPHY — Tufan Sezer
+   Display = Bricolage Grotesque (tight, heavy, optically sized)
+   Body    = Instrument Sans (calm, readable)
+   Mono    = JetBrains Mono — the "slate" voice: uppercase, tracked,
+             used for labels, nav, meta, buttons. This is the signature.
+   ============================================================ */
+:root {
+  /* ---- Families ---- */
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body:    "Instrument Sans", sans-serif;
+  --font-mono:    "JetBrains Mono", monospace;
+
+  /* ---- Weights ---- */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-black:    800;
+
+  /* ---- Display scale (fluid clamps, as used on site) ---- */
+  --text-hero:    clamp(44px, 6.4vw, 84px);  /* h1 hero */
+  --text-display: clamp(36px, 5.4vw, 68px);  /* big CTA headline */
+  --text-h2:      clamp(30px, 4vw, 48px);    /* section heading */
+  --text-h3:      19px;                       /* card title */
+
+  /* ---- Body scale ---- */
+  --text-lead:    clamp(16px, 1.6vw, 19px);  /* intro paragraph */
+  --text-base:    17px;                       /* default body */
+  --text-sm:      15px;                       /* secondary copy */
+  --text-xs:      14px;                       /* card descriptions */
+
+  /* ---- Mono / "slate" scale ---- */
+  --text-mono:    13px;   /* nav, tools, buttons */
+  --text-mono-sm: 12px;   /* slate labels, filters */
+  --text-mono-xs: 11px;   /* meta, footer, reel chrome */
+  --text-mono-xxs:10.5px; /* card meta */
+
+  /* ---- Line heights ---- */
+  --leading-tight:   1.0;   /* hero display */
+  --leading-snug:    1.1;   /* large display */
+  --leading-heading: 1.2;
+  --leading-body:    1.6;   /* running text */
+  --leading-card:    1.5;
+
+  /* ---- Letter-spacing (tracking) ---- */
+  --tracking-display: -0.02em;  /* tighten big display */
+  --tracking-h2:      -0.01em;
+  --tracking-normal:   0;
+  --tracking-mono:     0.10em;  /* default mono tracking */
+  --tracking-mono-wide:0.14em;  /* slate labels, REC, badges */
+}
+
+/* ---- Optional helper classes (components may prefer raw vars) ---- */
+.ts-display { font-family: var(--font-display); font-weight: var(--weight-black); letter-spacing: var(--tracking-display); line-height: var(--leading-snug); }
+.ts-h2      { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-h2); letter-spacing: var(--tracking-h2); }
+.ts-body    { font-family: var(--font-body); font-size: var(--text-base); line-height: var(--leading-body); }
+.ts-slate   { font-family: var(--font-mono); font-size: var(--text-mono-sm); letter-spacing: var(--tracking-mono-wide); text-transform: uppercase; color: var(--text-accent); }

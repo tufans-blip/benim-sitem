@@ -1,0 +1,167 @@
+<!-- @dsCard group="Portfolio" viewport="1180x760" name="Portfolio — full site" subtitle="Hero + reel, filterable work grid, quotes, tools, CTA" -->
+<!-- @startingPoint section="Portfolio" subtitle="Tufan Sezer portfolio site recreation" viewport="1180x900" -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tufan Sezer — Portfolio UI Kit</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--ts-bg); color: var(--ts-ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  img { display: block; max-width: 100%; }
+  @media (max-width: 900px) {
+    .ts-hero-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+    .ts-works, .ts-quotes { grid-template-columns: 1fr 1fr !important; }
+    /* Floating cards like desktop, scaled to fit the column */
+    .ts-hero-cards { min-height: 600px !important; aspect-ratio: auto !important; }
+    .ts-hero-cards > a { width: 62% !important; }
+    .ts-hero-cards > a:nth-child(1) { top: -6% !important; left: 0% !important;  width: 62% !important; }
+    .ts-hero-cards > a:nth-child(2) { top: 14% !important; left: 38% !important; width: 62% !important; }
+    .ts-hero-cards > a:nth-child(3) { top: 42% !important; left: 0% !important;  width: 50% !important; }
+    .ts-hero-cards > a:nth-child(4) { top: 60% !important; left: 40% !important; width: 43% !important; }
+    .ts-hero-cards a span span { white-space: normal !important; }
+  }
+  @media (max-width: 640px) {
+    .ts-navlinks { display: none !important; }
+    .ts-works, .ts-quotes { grid-template-columns: 1fr !important; }
+    header#top { padding: 96px 0 48px !important; }
+    /* Hero metnini küçült ki kartlar öne çıksın */
+    header#top h1 { font-size: calc(var(--text-hero) * .5) !important; margin: 10px 0 14px !important; }
+    header#top p { font-size: max(12px, calc(var(--text-lead) * .55)) !important; margin-bottom: 22px !important; }
+  }
+  /* Tweaks: film grain control */
+  .ts-grain::after { opacity: var(--grain-op, .05) !important; }
+  body[data-grain="off"] .ts-grain::after { display: none !important; }
+  /* Per-card grain overlay */
+  .ts-card-grain { position: absolute; inset: 0; border-radius: 12px; pointer-events: none; z-index: 5;
+    opacity: var(--card-grain-op, 0); mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); }
+  /* Tweaks: apply token swaps instantly (transitioned background/color
+     won't re-resolve a changed custom prop in some engines otherwise) */
+  html.ts-no-trans *, html.ts-no-trans *::before, html.ts-no-trans *::after { transition: none !important; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../../_ds_bundle.js"></script>
+  <script src="data.js"></script>
+  <script type="text/babel" src="Sections.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel">
+    const App = window.TS_App;
+    const { useTweaks, TweaksPanel, TweakSection, TweakSlider, TweakToggle, TweakColor } = window;
+
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "accent": [
+        "#ffb340",
+        "#ffc468",
+        "#c97f1a"
+      ],
+      "ground": [
+        "#0c0b0a",
+        "#161310",
+        "#070605",
+        "#241f19"
+      ],
+      "grain": true,
+      "grainIntensity": 12,
+      "letterbox": true,
+      "cardColor": "#a5977e",
+      "cardInk": "#ffffff",
+      "cardKicker": "#000000",
+      "cardShadow": 100,
+      "cardGrain": 100
+    }/*EDITMODE-END*/;
+
+    function Root() {
+      const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+      React.useEffect(() => {
+        const root = document.documentElement;
+        root.classList.add("ts-no-trans");
+        const r = root.style;
+        const [a, ahi, adeep] = t.accent;
+        r.setProperty("--ts-amber", a);
+        r.setProperty("--ts-amber-hi", ahi);
+        r.setProperty("--ts-amber-deep", adeep);
+        const [bg, raise, sink, line] = t.ground;
+        r.setProperty("--ts-bg", bg);
+        r.setProperty("--ts-bg-raise", raise);
+        r.setProperty("--ts-bg-sink", sink);
+        r.setProperty("--ts-line", line);
+        r.setProperty("--letterbox", t.letterbox ? "10px" : "0px");
+        r.setProperty("--grain-op", (t.grainIntensity / 100).toString());
+        document.body.setAttribute("data-grain", t.grain ? "on" : "off");
+        // Card color + text colors (manual)
+        const cc = t.cardColor || "#bbb3a5";
+        r.setProperty("--card-bg", cc);
+        const hx = cc.replace("#", "");
+        const rr = parseInt(hx.substr(0,2),16), gg = parseInt(hx.substr(2,2),16), bb = parseInt(hx.substr(4,2),16);
+        const lum = (0.299*rr + 0.587*gg + 0.114*bb) / 255;
+        const light = lum > 0.5;
+        r.setProperty("--card-ink", t.cardInk || (light ? "#16110a" : "#f6f1e8"));
+        r.setProperty("--card-kicker", t.cardKicker || (light ? "#5a3a08" : "#ffc468"));
+        r.setProperty("--card-line", light ? "rgba(0,0,0,.28)" : "rgba(255,255,255,.16)");
+        // Card shadow strength (slider 0-100)
+        const sv = (t.cardShadow ?? 85) / 100;
+        r.setProperty("--card-shadow", `0 ${Math.round(14 + sv*40)}px ${Math.round(34 + sv*92)}px rgba(0,0,0,${(sv*0.9).toFixed(3)}), 0 ${Math.round(6 + sv*16)}px ${Math.round(14 + sv*30)}px rgba(0,0,0,${(sv*0.55).toFixed(3)})`);
+        r.setProperty("--card-shadow-hover", `0 ${Math.round(22 + sv*48)}px ${Math.round(50 + sv*110)}px rgba(0,0,0,${(sv*0.95).toFixed(3)}), 0 ${Math.round(8 + sv*20)}px ${Math.round(18 + sv*38)}px rgba(0,0,0,${(sv*0.6).toFixed(3)})`);
+        r.setProperty("--card-grain-op", ((t.cardGrain ?? 0) / 100 * 0.6).toFixed(3));
+        requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("ts-no-trans")));
+      }, [t]);
+      return (
+        <>
+          <App />
+          <TweaksPanel title="Tweaks">
+            <TweakSection label="Color grade" />
+            <TweakColor label="Accent" value={t.accent}
+              options={[["#ffb340","#ffc468","#c97f1a"],["#6fb8a8","#8fd0c1","#3f8e7e"],["#e85d4a","#ff7d6b","#b23e2f"]]}
+              onChange={(v) => setTweak("accent", v)} />
+            <TweakColor label="Ground" value={t.ground}
+              options={[["#14110e","#1d1915","#0e0c0a","#2e2820"],["#0c0b0a","#161310","#070605","#241f19"],["#1a1410","#241c16","#120d09","#372e23"]]}
+              onChange={(v) => setTweak("ground", v)} />
+            <TweakSection label="Film" />
+            <TweakToggle label="Film grain" value={t.grain} onChange={(v) => setTweak("grain", v)} />
+            <TweakSlider label="Grain intensity" value={t.grainIntensity} min={0} max={12} step={1} unit="%" onChange={(v) => setTweak("grainIntensity", v)} />
+            <TweakToggle label="Letterbox bands" value={t.letterbox} onChange={(v) => setTweak("letterbox", v)} />
+            <TweakSection label="Kartlar" />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "6px 0" }}>
+              <span style={{ fontSize: 12, letterSpacing: ".04em", color: "#cfc7bb" }}>Kart rengi</span>
+              <input type="color" value={t.cardColor} onChange={(e) => setTweak("cardColor", e.target.value)}
+                style={{ width: 48, height: 30, padding: 0, border: "1px solid #3a352e", borderRadius: 6, background: "transparent", cursor: "pointer" }} />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "6px 0" }}>
+              <span style={{ fontSize: 12, letterSpacing: ".04em", color: "#cfc7bb" }}>Başlık rengi</span>
+              <input type="color" value={t.cardInk} onChange={(e) => setTweak("cardInk", e.target.value)}
+                style={{ width: 48, height: 30, padding: 0, border: "1px solid #3a352e", borderRadius: 6, background: "transparent", cursor: "pointer" }} />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "6px 0" }}>
+              <span style={{ fontSize: 12, letterSpacing: ".04em", color: "#cfc7bb" }}>Etiket rengi</span>
+              <input type="color" value={t.cardKicker} onChange={(e) => setTweak("cardKicker", e.target.value)}
+                style={{ width: 48, height: 30, padding: 0, border: "1px solid #3a352e", borderRadius: 6, background: "transparent", cursor: "pointer" }} />
+            </div>
+            <TweakSlider label="Gölge gücü" value={t.cardShadow} min={0} max={100} step={1} unit="%" onChange={(v) => setTweak("cardShadow", v)} />
+            <TweakSlider label="Kart grain" value={t.cardGrain} min={0} max={100} step={1} unit="%" onChange={(v) => setTweak("cardGrain", v)} />
+          </TweaksPanel>
+        </>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
+  </script>
+  <template id="__bundler_thumbnail">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <rect width="512" height="512" fill="#14110e"/>
+      <g transform="translate(154 154)">
+        <rect x="0" y="24" width="204" height="156" rx="14" fill="#ffb340"/>
+        <rect x="20" y="44" width="164" height="116" rx="6" fill="#14110e"/>
+        <path d="M84 74 L138 102 L84 130 Z" fill="#ffb340"/>
+      </g>
+    </svg>
+  </template>
+</body>
+</html>
