@@ -1,0 +1,55 @@
+/* ============================================================
+   COLORS — "night gas station"
+   A warm near-black ground lit by tungsten / sodium-vapour amber.
+   Cinematic: low-key, high-warmth, one cool grade note (teal) used
+   sparingly. Everything is warm-shifted — there are no pure greys.
+   ============================================================ */
+:root {
+  /* ---- Base ramp (warm near-blacks → warm whites) ---- */
+  --ts-bg:        #14110e;  /* page ground — asphalt at night */
+  --ts-bg-raise:  #1d1915;  /* raised surface — card / panel */
+  --ts-bg-sink:   #0e0c0a;  /* recessed — thumbnail wells, video */
+  --ts-line:      #2e2820;  /* hairline borders, dividers */
+  --ts-ink:       #efe9df;  /* primary text — warm white */
+  --ts-ink-dim:   #9a8f7f;  /* secondary text — warm grey */
+  --ts-ink-faint: #5a5246;  /* placeholder / disabled text */
+
+  /* ---- Brand accent: tungsten amber ---- */
+  --ts-amber:      #ffb340;  /* primary accent, sodium-vapour light */
+  --ts-amber-hi:   #ffc468;  /* hover / lift */
+  --ts-amber-deep: #c97f1a;  /* meta labels, pressed, low-emphasis amber */
+  --ts-on-amber:   #1a1206;  /* text/icon on an amber fill */
+
+  /* ---- Supporting grade notes (use sparingly) ---- */
+  --ts-teal:  #6fb8a8;  /* complementary cool note for film-grade accents */
+  --ts-rec:   #e85d4a;  /* "REC" red — status only, never decorative */
+
+  /* ============================================================
+     SEMANTIC ALIASES — prefer these in component code
+     ============================================================ */
+  --surface-page:     var(--ts-bg);
+  --surface-card:     var(--ts-bg-raise);
+  --surface-well:     var(--ts-bg-sink);
+  --border-hairline:  var(--ts-line);
+  --border-strong:    var(--ts-amber-deep);
+
+  --text-strong:      var(--ts-ink);
+  --text-body:        var(--ts-ink);
+  --text-muted:       var(--ts-ink-dim);
+  --text-faint:       var(--ts-ink-faint);
+  --text-accent:      var(--ts-amber);
+
+  --accent:           var(--ts-amber);
+  --accent-hover:     var(--ts-amber-hi);
+  --accent-quiet:     var(--ts-amber-deep);
+  --on-accent:        var(--ts-on-amber);
+
+  --status-rec:       var(--ts-rec);
+  --grade-cool:       var(--ts-teal);
+
+  --focus-ring:       var(--ts-amber);
+  --selection-bg:     var(--ts-amber);
+  --selection-fg:     var(--ts-bg);
+}
+
+::selection { background: var(--selection-bg); color: var(--selection-fg); }

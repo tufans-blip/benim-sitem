@@ -1,0 +1,14 @@
+{
+  "name": "tufan-sezer-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tufan Sezer — AI artist & filmmaker portfolio. Production build (no runtime Babel).",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "preview": "npm run build && npx --yes serve dist"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}

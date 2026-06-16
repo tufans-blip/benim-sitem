@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tufan Sezer — AI Sanatçısı & Film Yönetmeni</title>
+<meta name="description" content="İstanbul merkezli AI sanatçısı ve film yönetmeni. Karakter tasarımı, kısa reklam filmleri ve animasyon — ComfyUI tabanlı uçtan uca lokal prodüksiyon.">
+<link rel="stylesheet" href="styles.css">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--ts-bg); color: var(--ts-ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  img { display: block; max-width: 100%; }
+  @media (max-width: 900px) {
+    .ts-hero-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+    .ts-works, .ts-quotes { grid-template-columns: 1fr 1fr !important; }
+    .ts-hero-cards { min-height: 600px !important; aspect-ratio: auto !important; }
+    .ts-hero-cards > a { width: 62% !important; }
+    .ts-hero-cards > a:nth-child(1) { top: -6% !important; left: 0% !important;  width: 62% !important; }
+    .ts-hero-cards > a:nth-child(2) { top: 14% !important; left: 38% !important; width: 62% !important; }
+    .ts-hero-cards > a:nth-child(3) { top: 42% !important; left: 0% !important;  width: 50% !important; }
+    .ts-hero-cards > a:nth-child(4) { top: 60% !important; left: 40% !important; width: 43% !important; }
+    .ts-hero-cards a span span { white-space: normal !important; }
+  }
+  @media (max-width: 640px) {
+    .ts-navlinks { display: none !important; }
+    .ts-works, .ts-quotes { grid-template-columns: 1fr !important; }
+    header#top { padding: 96px 0 48px !important; }
+    header#top h1 { font-size: calc(var(--text-hero) * .5) !important; margin: 10px 0 14px !important; }
+    header#top p { font-size: max(12px, calc(var(--text-lead) * .55)) !important; margin-bottom: 22px !important; }
+  }
+  .ts-grain::after { opacity: var(--grain-op, .05) !important; }
+  body[data-grain="off"] .ts-grain::after { display: none !important; }
+  .ts-card-grain { position: absolute; inset: 0; border-radius: 12px; pointer-events: none; z-index: 5;
+    opacity: var(--card-grain-op, 0); mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); }
+  html.ts-no-trans *, html.ts-no-trans *::before, html.ts-no-trans *::after { transition: none !important; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React (production builds, no Babel runtime). -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+
+  <!-- Design-system bundle + content data (plain JS). -->
+  <script src="_ds_bundle.js"></script>
+  <script src="data.js"></script>
+
+  <!-- App — pre-compiled from JSX by esbuild at build time. Load order matters. -->
+  <script src="js/portfolio-app.js"></script>
+  <script src="js/tweaks-panel.js"></script>
+  <script src="js/app-root.js"></script>
+</body>
+</html>

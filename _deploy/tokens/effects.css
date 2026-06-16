@@ -1,0 +1,38 @@
+/* ============================================================
+   EFFECTS — grain, motion, focus, the cinematic chrome
+   The brand has no drop-shadow system. Depth comes from
+   warm value steps + hairline borders, not shadows. The two
+   signature effects are the film-grain overlay and the letterbox.
+   ============================================================ */
+:root {
+  /* ---- Motion ---- */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --dur-fast:   0.15s;   /* @kind other */ /* button lift / press */
+  --dur-base:   0.2s;    /* @kind other */ /* color / border transitions */
+  --dur-slow:   0.25s;   /* @kind other */ /* card hover */
+  --dur-reveal: 0.6s;    /* @kind other */ /* scroll-reveal fade-up */
+
+  --lift:   translateY(-2px);  /* @kind other */ /* button hover */
+  --lift-card: translateY(-4px); /* @kind other */ /* card hover */
+
+  /* ---- Glow (used only as radial light pools, never box-shadow) ---- */
+  --glow-amber: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(255,179,64,.08), transparent 70%); /* @kind other */
+}
+
+/* ---- Film grain overlay — apply to a fixed full-bleed layer ---- */
+.ts-grain::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+/* ---- Focus ring — amber, offset ---- */
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

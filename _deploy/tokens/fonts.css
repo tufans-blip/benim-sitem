@@ -1,0 +1,9 @@
+/* ============================================================
+   FONTS — Tufan Sezer
+   Three Google-hosted families. Loaded via Google Fonts CSS,
+   which declares the @font-face rules and ships the webfonts.
+   - Bricolage Grotesque : display / headlines (optical-size variable)
+   - Instrument Sans     : body / running text
+   - JetBrains Mono      : the "slate" language — labels, meta, nav
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");

@@ -1,0 +1,26 @@
+# Netlify deployment config — Tufan Sezer Portfolio
+# Netlify runs the build in CI, so the published site contains NO runtime Babel:
+# the JSX is pre-compiled to plain JS by esbuild (see build.mjs).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Long-cache the immutable media + compiled JS
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
