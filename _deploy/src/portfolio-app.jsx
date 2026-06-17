@@ -44,13 +44,24 @@ function WebpImage({ src, alt = "", style, loading = "lazy", decoding = "async",
   const entry = TS_THUMBS[src];
   const useThumb = entry ? (entry.thumb320 || entry.thumb480) : null;
   const srcForImg = useThumb ? useThumb : src;
-  const srcset = entry ? (entry.thumb480 ? `${entry.thumb480} 480w, ${entry.thumb320} 320w` : entry.thumb320) : (hasWebp ? webp : null);
+  const hasSrcset = entry && entry.thumb480;
+  const srcset = hasSrcset ? `${entry.thumb480} 480w, ${entry.thumb320} 320w` : (entry && entry.thumb320 ? entry.thumb320 : null);
+  const sizes = hasSrcset ? "(max-width: 480px) 320px, 480px" : undefined;
   const wrapperStyle = { display: "block", width: "100%", height: "100%" };
-  if (entry && entry.lqip) wrapperStyle.backgroundImage = `url(${entry.lqip})`, wrapperStyle.backgroundSize = "cover", wrapperStyle.backgroundPosition = "center";
+  const picRef = React.useRef(null);
+  if (entry && entry.lqip) {
+    wrapperStyle.backgroundImage = `url(${entry.lqip})`;
+    wrapperStyle.backgroundSize = "cover";
+    wrapperStyle.backgroundPosition = "center";
+    wrapperStyle.transition = "background-image .3s ease-out";
+  }
+  const handleLoad = React.useCallback(() => {
+    if (picRef.current) picRef.current.style.backgroundImage = "none";
+  }, []);
   return (
-    <picture style={wrapperStyle}>
-      {srcset ? <source srcSet={srcset} type="image/webp" /> : (hasWebp ? <source srcSet={webp} type="image/webp" /> : null)}
-      <img src={srcForImg} alt={alt} loading={loading} decoding={decoding} style={style} />
+    <picture ref={picRef} style={wrapperStyle}>
+      {srcset ? <source srcSet={srcset} sizes={sizes} type="image/webp" /> : (hasWebp ? <source srcSet={webp} type="image/webp" /> : null)}
+      <img src={srcForImg} alt={alt} loading={loading} decoding={decoding} style={style} onLoad={handleLoad} />
     </picture>
   );
 }
