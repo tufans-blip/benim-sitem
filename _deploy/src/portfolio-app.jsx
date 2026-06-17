@@ -17,25 +17,99 @@ function ThumbSources({ mp4 }) {
     </React.Fragment>
   );
 }
+function WebpImage({ src, alt = "", style, loading = "lazy", decoding = "async", defer = false }) {
+  const webp = src.replace(/\.(jpe?g|png)$/i, ".webp");
+  const hasWebp = typeof D === "object" && D.webpSet && D.webpSet[webp];
+  const ref = React.useRef(null);
+  const [visible, setVisible] = React.useState(!defer);
+
+  React.useEffect(() => {
+    if (!defer || typeof window === "undefined" || !ref.current) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { setVisible(true); io.disconnect(); break; }
+    }, { rootMargin: "400px 0px", threshold: 0.01 });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [defer]);
+
+  if (!visible) {
+    return <div ref={ref} aria-hidden="true" style={{ width: "100%", height: "100%", background: "var(--ts-bg-sink)" }} />;
+  }
+  // If the build produced thumbs mapping, prefer the appropriate thumb
+  const TS_THUMBS = typeof window !== "undefined" ? window.TS_THUMBS || {} : {};
+  const entry = TS_THUMBS[src];
+  const useThumb = entry ? (entry.thumb320 || entry.thumb480) : null;
+  const srcForImg = useThumb ? useThumb : src;
+  const srcset = entry ? (entry.thumb480 ? `${entry.thumb480} 480w, ${entry.thumb320} 320w` : entry.thumb320) : (hasWebp ? webp : null);
+  const wrapperStyle = { display: "block", width: "100%", height: "100%" };
+  if (entry && entry.lqip) wrapperStyle.backgroundImage = `url(${entry.lqip})`, wrapperStyle.backgroundSize = "cover", wrapperStyle.backgroundPosition = "center";
+  return (
+    <picture style={wrapperStyle}>
+      {srcset ? <source srcSet={srcset} type="image/webp" /> : (hasWebp ? <source srcSet={webp} type="image/webp" /> : null)}
+      <img src={srcForImg} alt={alt} loading={loading} decoding={decoding} style={style} />
+    </picture>
+  );
+}
 function AutoVideo({ poster, style, children }) {
   const ref = React.useRef(null);
+  const [canLoad, setCanLoad] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [saveData, setSaveData] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.connection) return;
+    const conn = navigator.connection;
+    const update = () => setSaveData(Boolean(conn.saveData));
+    update();
+    conn.addEventListener("change", update);
+    return () => conn.removeEventListener("change", update);
+  }, []);
+
   React.useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    v.muted = true; v.defaultMuted = true;
-    if (typeof IntersectionObserver === "undefined") { v.play().catch(() => {}); return; }
+    if (typeof IntersectionObserver === "undefined") {
+      setCanLoad(true);
+      return;
+    }
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
-        if (e.isIntersecting) v.play().catch(() => {});
-        else v.pause();
+        if (e.isIntersecting) {
+          setCanLoad(true);
+          break;
+        }
       }
     }, { rootMargin: "300px 0px", threshold: 0.01 });
     io.observe(v);
     return () => io.disconnect();
   }, []);
+
+  React.useEffect(() => {
+    const v = ref.current;
+    if (!v || !canLoad || isMobile || saveData) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.play().catch(() => {});
+    return () => v.pause();
+  }, [canLoad, isMobile, saveData]);
+
+  const showVideo = canLoad && !isMobile && !saveData;
   return (
-    <video ref={ref} poster={poster} muted loop playsInline preload="none" style={style}>
-      {children}
+    <video ref={ref} poster={poster} muted loop playsInline preload={showVideo ? "metadata" : "none"} style={style}>
+      {showVideo ? children : null}
     </video>
   );
 }
@@ -111,7 +185,7 @@ function Hero({ onExpandReel, onPickCat }) {
                     <ThumbSources mp4={c.video} />
                   </AutoVideo>
                 ) : (
-                  <img src={c.img} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <WebpImage src={c.img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 )}
               </span>
               <span style={{ display: "block", padding: "0 8px" }}>
@@ -201,7 +275,7 @@ function FloatingCards({ works, onOpen, positions, overlay, aspect, showGuide })
                     <ThumbSources mp4={w.videoSrc} />
                   </AutoVideo>
                 ) : (
-                  <img src={w.image} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <WebpImage src={w.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 )}
                 <span style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,6,5,.86) 0%, rgba(8,6,5,.42) 26%, transparent 52%)" }}></span>
                 <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 22px 22px" }}>
@@ -217,7 +291,7 @@ function FloatingCards({ works, onOpen, positions, overlay, aspect, showGuide })
                       <ThumbSources mp4={w.videoSrc} />
                     </AutoVideo>
                   ) : (
-                    <img src={w.image} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <WebpImage src={w.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   )}
                 </span>
                 <span style={{ display: "block", padding: "2px 8px 4px" }}>
@@ -230,7 +304,7 @@ function FloatingCards({ works, onOpen, positions, overlay, aspect, showGuide })
           </a>
         );
       })}
-      <style>{"@media(prefers-reduced-motion:reduce){.ts-reel-cards a{animation:none!important}}"}</style>
+      <style>{"@media(prefers-reduced-motion:reduce){.ts-reel-cards a{animation:none!important}}@media(max-width:640px){.ts-reel-cards a{animation:none!important}}"}</style>
     </div>
     </div>
   );
@@ -420,7 +494,7 @@ function Lightbox({ item, onClose }) {
                       style={{ flex: "0 0 auto", width: `${TH_W}px`, height: `${TH_H}px`, padding: 0, cursor: "pointer", borderRadius: "12px", overflow: "hidden",
                         border: "1px solid " + (active ? "var(--ts-amber)" : "var(--ts-line)"), background: "var(--ts-bg-sink)",
                         boxShadow: active ? "0 22px 50px rgba(0,0,0,.5)" : "0 12px 28px rgba(0,0,0,.4)", transition: "border-color .3s, box-shadow .3s" }}>
-                      <img src={gallery[real]} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      <WebpImage src={gallery[real]} alt="" defer={true} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </button>
                   );
                 })}
