@@ -17,6 +17,28 @@ function ThumbSources({ mp4 }) {
     </React.Fragment>
   );
 }
+function AutoVideo({ poster, style, children }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    v.muted = true; v.defaultMuted = true;
+    if (typeof IntersectionObserver === "undefined") { v.play().catch(() => {}); return; }
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      }
+    }, { rootMargin: "300px 0px", threshold: 0.01 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <video ref={ref} poster={poster} muted loop playsInline preload="none" style={style}>
+      {children}
+    </video>
+  );
+}
 const secHeadH2 = { fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "var(--text-h2)", letterSpacing: "-.01em", color: "var(--ts-ink)", margin: "16px 0 0" };
 
 function Nav() {
@@ -85,13 +107,11 @@ function Hero({ onExpandReel, onPickCat }) {
               <span className="ts-card-grain"></span>
               <span style={{ display: "block", aspectRatio: "16 / 9", borderRadius: "8px", overflow: "hidden", background: "var(--ts-bg-sink)", marginBottom: "12px", border: "1px solid var(--card-line, rgba(0,0,0,.20))" }}>
                 {c.video ? (
-                  <video autoPlay muted loop playsInline preload="metadata"
-                    ref={el => { if (el) { el.muted = true; el.defaultMuted = true; } }}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }}>
+                  <AutoVideo style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }}>
                     <ThumbSources mp4={c.video} />
-                  </video>
+                  </AutoVideo>
                 ) : (
-                  <img src={c.img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={c.img} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 )}
               </span>
               <span style={{ display: "block", padding: "0 8px" }}>
@@ -177,13 +197,11 @@ function FloatingCards({ works, onOpen, positions, overlay, aspect, showGuide })
             {overlay ? (
               <span style={{ position: "relative", display: "block", width: "100%", aspectRatio: cardAspect, overflow: "hidden", background: "var(--ts-bg-sink)" }}>
                 {w.video ? (
-                  <video poster={w.image} autoPlay muted loop playsInline preload="metadata"
-                    ref={el => { if (el) { el.muted = true; el.defaultMuted = true; } }}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}>
+                  <AutoVideo poster={w.image} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}>
                     <ThumbSources mp4={w.videoSrc} />
-                  </video>
+                  </AutoVideo>
                 ) : (
-                  <img src={w.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={w.image} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 )}
                 <span style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,6,5,.86) 0%, rgba(8,6,5,.42) 26%, transparent 52%)" }}></span>
                 <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 22px 22px" }}>
@@ -195,13 +213,11 @@ function FloatingCards({ works, onOpen, positions, overlay, aspect, showGuide })
                 <span className="ts-card-grain"></span>
                 <span style={{ display: "block", aspectRatio: "16 / 9", borderRadius: "8px", overflow: "hidden", background: "var(--ts-bg-sink)", marginBottom: "12px", border: "1px solid var(--card-line, rgba(0,0,0,.20))" }}>
                   {w.video ? (
-                    <video poster={w.image} autoPlay muted loop playsInline preload="metadata"
-                      ref={el => { if (el) { el.muted = true; el.defaultMuted = true; } }}
-                      style={{ width: "100%", height: "100%", objectFit: w.fit === "contain" || w.fit === "scale-down" ? "contain" : "cover", display: "block" }}>
+                    <AutoVideo poster={w.image} style={{ width: "100%", height: "100%", objectFit: w.fit === "contain" || w.fit === "scale-down" ? "contain" : "cover", display: "block" }}>
                       <ThumbSources mp4={w.videoSrc} />
-                    </video>
+                    </AutoVideo>
                   ) : (
-                    <img src={w.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <img src={w.image} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   )}
                 </span>
                 <span style={{ display: "block", padding: "2px 8px 4px" }}>
@@ -238,7 +254,7 @@ function LogoMarquee() {
             const cn = n === "cn";
             const med = n === "kr" || n === "p" || n === "pop";
             return (
-            <img key={i} src={"assets/logos/mono/" + n + ".png"} alt="" aria-hidden="true"
+            <img key={i} src={"assets/logos/mono/" + n + ".png"} alt="" aria-hidden="true" loading="lazy" decoding="async"
               style={{ height: big ? "59px" : dhc ? "70px" : dc ? "52px" : cn ? "48px" : med ? "58px" : "40px", width: "auto", maxWidth: big ? "280px" : "180px", objectFit: "contain", opacity: big ? 0.96 : 0.82, flex: "none", display: "block" }} />
             );
           })}
@@ -341,6 +357,8 @@ function Footer() {
 
 function Lightbox({ item, onClose }) {
   const vref = React.useRef(null);
+  const touchRef = React.useRef(null);
+  const swipedRef = React.useRef(false);
   const [idx, setIdx] = React.useState(0);
   const [selected, setSelected] = React.useState(null);
   const gallery = (item && item.gallery && item.gallery.length) ? item.gallery : null;
@@ -355,21 +373,27 @@ function Lightbox({ item, onClose }) {
     v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
     return () => { v.pause(); v.src = ""; v.load(); };
   }, [item]);
+  const goRel = React.useCallback((d) => {
+    if (!gallery) return;
+    setSelected(s => (s == null ? s : Math.min(gallery.length - 1, Math.max(0, s + d))));
+  }, [gallery]);
   React.useEffect(() => {
     if (!gallery) return;
     const onKey = e => {
-      if (e.key === "Escape" && selected != null) { setSelected(null); }
-      else if (e.key === "ArrowRight") setIdx(i => Math.min(i + 1, gallery.length - 1));
-      else if (e.key === "ArrowLeft") setIdx(i => Math.max(i - 1, 0));
+      if (selected == null) return;
+      if (e.key === "Escape") setSelected(null);
+      else if (e.key === "ArrowRight") goRel(1);
+      else if (e.key === "ArrowLeft") goRel(-1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [gallery, selected]);
+  }, [gallery, selected, goRel]);
   if (!item) return null;
 
   // ── Project gallery: tilted scrolling strip; click → big image center, strip blurred below ─
   if (gallery) {
     const big = selected != null;
+    const navBtnStyle = (side) => ({ position: "absolute", top: "50%", [side]: "max(12px, 3vw)", transform: "translateY(-50%)", pointerEvents: "auto", zIndex: 3, width: "56px", height: "56px", borderRadius: "50%", border: "1px solid var(--ts-line)", background: "rgba(10,8,7,.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", color: "var(--ts-ink)", fontSize: "30px", lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", paddingBottom: "4px" });
     const TH_W = 320, TH_H = Math.round(TH_W * 9 / 16), GAP = 20, ROW_GAP = 20;
     const nRows = gallery.length > 8 ? 3 : 2; // ≤8 görsel → 2 sıra, >8 → 3 sıra
     const metaParts = item.meta.split("·").map(s => s.trim());
@@ -396,7 +420,7 @@ function Lightbox({ item, onClose }) {
                       style={{ flex: "0 0 auto", width: `${TH_W}px`, height: `${TH_H}px`, padding: 0, cursor: "pointer", borderRadius: "12px", overflow: "hidden",
                         border: "1px solid " + (active ? "var(--ts-amber)" : "var(--ts-line)"), background: "var(--ts-bg-sink)",
                         boxShadow: active ? "0 22px 50px rgba(0,0,0,.5)" : "0 12px 28px rgba(0,0,0,.4)", transition: "border-color .3s, box-shadow .3s" }}>
-                      <img src={gallery[real]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      <img src={gallery[real]} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </button>
                   );
                 })}
@@ -422,8 +446,17 @@ function Lightbox({ item, onClose }) {
           {strip}
           {big && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 32px", pointerEvents: "none", zIndex: 2 }}>
-              <img key={gallery[selected]} src={gallery[selected]} alt={item.title} onClick={() => setSelected(null)}
-                style={{ maxWidth: "min(1000px, 88vw)", maxHeight: "82%", objectFit: "contain", borderRadius: "16px", border: "1px solid var(--ts-line)", background: "var(--ts-bg-sink)", boxShadow: "0 30px 80px rgba(0,0,0,.6)", animation: "tsFade .4s ease", cursor: "zoom-out", pointerEvents: "auto", display: "block" }} />
+              {selected > 0 && (
+                <button onClick={(e) => { e.stopPropagation(); goRel(-1); }} aria-label="Önceki görsel" style={navBtnStyle("left")}>‹</button>
+              )}
+              <img key={gallery[selected]} src={gallery[selected]} alt={item.title} decoding="async" fetchpriority="high"
+                onClick={() => { if (swipedRef.current) { swipedRef.current = false; return; } setSelected(null); }}
+                onTouchStart={(e) => { touchRef.current = e.touches[0].clientX; swipedRef.current = false; }}
+                onTouchEnd={(e) => { if (touchRef.current == null) return; const dx = e.changedTouches[0].clientX - touchRef.current; touchRef.current = null; if (Math.abs(dx) > 45) { swipedRef.current = true; goRel(dx < 0 ? 1 : -1); } }}
+                style={{ maxWidth: "min(1000px, 88vw)", maxHeight: "82%", objectFit: "contain", borderRadius: "16px", border: "1px solid var(--ts-line)", background: "var(--ts-bg-sink)", boxShadow: "0 30px 80px rgba(0,0,0,.6)", animation: "tsFade .4s ease", cursor: "zoom-out", pointerEvents: "auto", display: "block", touchAction: "pan-y", userSelect: "none", WebkitUserSelect: "none" }} />
+              {selected < gallery.length - 1 && (
+                <button onClick={(e) => { e.stopPropagation(); goRel(1); }} aria-label="Sonraki görsel" style={navBtnStyle("right")}>›</button>
+              )}
             </div>
           )}
         </div>
@@ -439,7 +472,7 @@ function Lightbox({ item, onClose }) {
         {item.videoSrc ? (
           <video ref={vref} src={item.videoSrc} poster={item.image} controls autoPlay playsInline style={{ width: "100%", maxHeight: "76vh", objectFit: "contain", border: "1px solid var(--ts-line)", background: "#000", display: "block" }} />
         ) : (
-          <img src={item.image} alt={item.title} style={{ width: "100%", maxHeight: "86vh", objectFit: "contain", border: "1px solid var(--ts-line)", background: "var(--ts-bg-sink)", display: "block" }} />
+          <img src={item.image} alt={item.title} decoding="async" style={{ width: "100%", maxHeight: "86vh", objectFit: "contain", border: "1px solid var(--ts-line)", background: "var(--ts-bg-sink)", display: "block" }} />
         )}
         <div style={{ marginTop: "14px", fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: ".12em", textTransform: "uppercase", color: "var(--ts-ink-dim)" }}>
           <span style={{ color: "var(--ts-amber)" }}>{item.title}</span> — {item.meta}

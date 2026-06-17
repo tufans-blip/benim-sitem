@@ -1,0 +1,7 @@
+# Netlify root config: run build inside `_deploy` and publish the generated `dist`
+[build]
+  command = "cd _deploy && npm run build"
+  publish = "_deploy/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
