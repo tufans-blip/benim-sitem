@@ -1475,10 +1475,10 @@ function FinalCTA() {
     }
   }, /*#__PURE__*/React.createElement(Button, {
     variant: "amber",
-    href: "mailto:eposta@adresin.com"
+    href: "mailto:tufans@gmail.com"
   }, "Bana Yaz \u2192"), /*#__PURE__*/React.createElement(Button, {
     variant: "ghost",
-    href: "#"
+    href: "https://www.instagram.com/2funart/"
   }, "Instagram"))));
 }
 function Footer() {
@@ -2397,10 +2397,10 @@ function FinalCTA() {
     }
   }, /*#__PURE__*/React.createElement(Button, {
     variant: "amber",
-    href: "mailto:eposta@adresin.com"
+    href: "mailto:tufans@gmail.com"
   }, "Bana Yaz \u2192"), /*#__PURE__*/React.createElement(Button, {
     variant: "ghost",
-    href: "#"
+    href: "https://www.instagram.com/2funart/"
   }, "Instagram"))));
 }
 function Footer() {
